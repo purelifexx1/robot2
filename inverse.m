@@ -1,0 +1,29 @@
+% L(1) = Link([0, 0.077, 0, pi/2]);
+% L(2) = Link([0 0 0.13 0]);
+% L(3) = Link([0 0 0.124 0]);
+% L(4) = Link([0 0 0.126 0]);
+% robot = SerialLink(L,'name','r');
+% px = 0.05;
+% py = 0.12;
+% pz = 0.1;
+% r31 = -0.65;
+function y = inverse(px, py, pz, r31)
+pxy = sqrt(px^2+py^2);
+p = sqrt(px^2 + py^2 + pz^2);
+si = (pz-0.126*r31-0.077)/0.124;
+A = -0.061999; 
+B = pxy;
+C = 0.62097*pz - 0.061999*(1.0161*r31 - 8.0645*pz + 0.62097)^2 - 1.0*(pz - 0.077)*(1.0161*r31 - 8.0645*pz + 0.62097) - 4.0323*p^2 + 0.040109;
+r = roots([A B C]);
+ci = min(r(1,1),r(2,1));
+AA = 2* 1.0484*ci;
+BB = 2* 1.0484*si;
+CC = si^2+ci^2+1.0484^2-1;
+c3 = (si^2+ci^2-1-1.0484^2)/(2*1.0484);
+t3 = -acos(c3);
+t2 = atan2(AA, -BB) - atan2(CC, sqrt(AA^2+BB^2-CC^2));
+t1 = atan2(py,px);
+t4 = asin(r31) - t2 - t3;
+y = [t1 t2 t3 t4];
+end
+%robot.fkine([theta1 theta2 theta3 theta4])
